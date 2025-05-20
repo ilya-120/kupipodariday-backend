@@ -50,6 +50,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Неверные учетные данные');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...result } = user;
     return result;
   }

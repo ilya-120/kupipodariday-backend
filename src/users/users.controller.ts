@@ -12,11 +12,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { AuthUser } from 'src/utils/decorators/user.decorator';
+import { Wish } from 'src/wishes/entities/wish.entity';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get('all')
-  getUsers(): Promise<User[]> {
+  getUsers(): Promise<Partial<User>[]> {
     return this.usersService.getAllUsers();
   }
   @UseGuards(JwtAuthGuard)
@@ -53,5 +54,16 @@ export class UsersController {
   @Post('find')
   findUserByUsernameOrEmail(@Body('query') query: string) {
     return this.usersService.findMany(query);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('me/wishes')
+  async findMyWishes(@AuthUser() user: User): Promise<Wish[]> {
+    const userId = user.id;
+    return await this.usersService.getMyWishes(userId);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get(':username/wishes')
+  findUserWishesByUsername(@Param('username') username: string) {
+    return this.usersService.getUserWishesByUsername(username);
   }
 }
