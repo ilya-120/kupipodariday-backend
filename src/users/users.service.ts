@@ -55,8 +55,8 @@ export class UsersService {
         delete user.password;
       }
       return user;
-    } catch (e) {
-      throw new NotFoundException('Пользователь не найден');
+    } catch (error) {
+      throw new NotFoundException('Пользователь не найден', error);
     }
   }
   async create(createUserDto: CreateUserDto) {
@@ -90,7 +90,7 @@ export class UsersService {
       }
       return savedUser;
     } catch (error) {
-      throw new ConflictException('Ошибка при создании пользователя');
+      throw new ConflictException('Ошибка при создании пользователя', error);
     }
   }
   async findByUsername(username: string): Promise<Partial<User> | null> {
