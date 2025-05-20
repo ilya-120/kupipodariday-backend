@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   UnauthorizedException,
+  ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -19,7 +20,6 @@ export class AuthService {
       if (createUserDto.about === '') {
         delete createUserDto.about;
       }
-
       const user = await this.usersService.create(createUserDto);
       if (!user) {
         throw new HttpException(
@@ -32,6 +32,9 @@ export class AuthService {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new HttpException(error.message, HttpStatus.CONFLICT);
+      }
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

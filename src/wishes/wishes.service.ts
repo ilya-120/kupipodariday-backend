@@ -22,10 +22,15 @@ export class WishesService {
   }
   async create(createWishDto: CreateWishDto, userId: number): Promise<Wish> {
     const userOwner = await this.usersService.findById(userId);
+    
+    const ownerWithoutEmail = { ...userOwner };
+    delete ownerWithoutEmail.email;
+    
     const wish = this.wishesRepository.create({
       ...createWishDto,
-      owner: userOwner,
+      owner: ownerWithoutEmail,
     });
+    
     return this.wishesRepository.save(wish);
   }
   async getLastWishes() {

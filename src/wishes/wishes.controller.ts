@@ -43,8 +43,8 @@ export class WishesController {
 
   @Post(':id/copy')
   @UseGuards(JwtAuthGuard)
-  copy(@Param() params: any, @AuthUser() user) {
-    return this.wishesService.copy(params.id, user.id);
+  copy(@Param('id') id: number, @AuthUser() user: User) {
+    return this.wishesService.copy(id, user.id);
   }
 
   @Patch(':id')

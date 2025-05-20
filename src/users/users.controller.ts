@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { AuthUser } from 'src/utils/decorators/user.decorator';
 import { Wish } from 'src/wishes/entities/wish.entity';
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -20,7 +21,7 @@ export class UsersController {
   getUsers(): Promise<Partial<User>[]> {
     return this.usersService.getAllUsers();
   }
-  @UseGuards(JwtAuthGuard)
+
   @Get('me')
   async findOne(@AuthUser() user: User): Promise<User> {
     return this.usersService.findOne({
@@ -36,7 +37,6 @@ export class UsersController {
       },
     });
   }
-  @UseGuards(JwtAuthGuard)
   @Patch('me')
   async updateMyProfile(
     @AuthUser() user: User,
@@ -45,23 +45,23 @@ export class UsersController {
     const { id } = user;
     return this.usersService.updateMyProfile(id, updateUserDto);
   }
-  @UseGuards(JwtAuthGuard)
   @Get(':username')
-  findUserByUsername(@Param('username') username: string) {
-    return this.usersService.findByUsername(username);
+  async findUserByUsername(@Param('username') username: string) {
+    const user = await this.usersService.findByUsername(username);
+    if (user && user.password) {
+      delete user.password;
+    }
+    return user;
   }
-  @UseGuards(JwtAuthGuard)
   @Post('find')
   findUserByUsernameOrEmail(@Body('query') query: string) {
     return this.usersService.findMany(query);
   }
-  @UseGuards(JwtAuthGuard)
   @Get('me/wishes')
   async findMyWishes(@AuthUser() user: User): Promise<Wish[]> {
     const userId = user.id;
     return await this.usersService.getMyWishes(userId);
   }
-  @UseGuards(JwtAuthGuard)
   @Get(':username/wishes')
   findUserWishesByUsername(@Param('username') username: string) {
     return this.usersService.getUserWishesByUsername(username);
